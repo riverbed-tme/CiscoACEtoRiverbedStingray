@@ -8,7 +8,7 @@
 #
 #
 #
-# Note: This script is not intended for complete migration. Please contact your Riverbed sales engineer for getting help on complete migration.
+# Note: This script is not intended for complete migration. Please contact your sales engineer or Riverbed Technical support for getting help on complete migration.
 #use strict;
 use feature qw(say switch);
 use modules::pool;
@@ -218,11 +218,14 @@ sslLoop: while ( $line = <config> ) {
 		my $vsname= $words[2];
 		my $vserver = new vserver( "$vsname");
 		print LOGFILE "$line";
+		#print "$line";
 		while ($line = <config>) {
 			$line =~ s/^\s+//;
+			#print "$line";
 			@words = split (" ",$line);
 			if (  $line eq "\r"  or $line =~ m/^!/i or $line eq "" ) { last; }
-			if ( $words[0] eq "class-map") { seek("config", -(length($line)+1), 1);last ;}
+			if ( $words[0] eq "class-map" and $words[1] eq ("match-all" or "match-any") ) { seek("config", -(length($line)+1), 1);  last ;}
+			if ( $words[0] eq "class-map" and $words[1] eq "type" ) { print LOGFILE "!$line";seek("config", -(length($line)+1), 1);  last ;}
 			if ( $words[1] eq "match" and $words[2] eq "virtual-address" ) {
 				my $tip = $words[3];
 				$vserver->setTip("$tip");
@@ -296,7 +299,10 @@ mmLoop:	while ($line = <config> ) {
 					if (  $line eq "\r"  or $line =~ m/^!/i or $line eq "" ) {last;}
 					if ( $words[0] eq "class" ) { seek("config", -(length($line)+1), 1);last ;}
 					if ($words[0] eq "loadbalance" and $words[1] eq "policy") { $classvip_to_pol_slb{$class_vip} = $words[2]; next;}
-					if ($words[0] eq "loadbalance" and $words[1] eq "vip" and $words[2] eq "inservice") { $allvirtual{$class_vip}->setEnable("yes"); next;}
+					if ($words[0] eq "loadbalance" and $words[1] eq "vip" and $words[2] eq "inservice") {
+						$name = $allvirtual{$class_vip}->getName();
+						$allvirtual{$class_vip}->setEnable("yes"); next;
+					}
 					if ($words[0] eq "ssl-proxy" and $words[1] eq "server") { $classvip_ssl{$class_vip} = $words[2]; next;}
 					else { print LOGFILE "!$line";}
 				}
@@ -365,9 +371,9 @@ foreach $mm (keys %pol_mm_class_vip) {
 	}
 }
 ############Create SSL ZCLI files########
-$file = 'sslzcli.txt';
-open(ZCLI,">zcli") or die "Cannot read file zcli";
-if ( -e $file) {
+if ( -e 'sslzcli.txt') {
+	$file = 'sslzcli.txt';
+	open(ZCLI,">zcli_for_ssl") or die "Cannot read file zcli_for_ssl";
 	open(SSLZCLI , $file);
 	print ZCLI "zcli <<EOF\n";
 	foreach $line (<SSLZCLI>) {
@@ -376,17 +382,27 @@ if ( -e $file) {
 	}
 print ZCLI "EOF\n";
 close ZCLI;
-}
 close SSLZCLI;
 unlink 'sslzcli.txt';
+}
 ############Tar the directory ##########
-my $tar = Archive::Tar->new();
-$dir = "conf";
-my @inventory = ();
-find (sub { push @inventory, $File::Find::name }, $dir);
-$tar->add_files( @inventory );
-$tar->write( "ACEtoSTM.tar" );
-rmtree('conf/');
+if ( -d "conf") {
+	$fol = "conf";	
+	my $tar = Archive::Tar->new();
+	my @inventory = ();
+	find (sub { push @inventory, $File::Find::name }, $fol);
+	$tar->add_files( @inventory );
+	$tar->write( "$fol.tar" );
+	rmtree("$fol");
 	
-
-                                                                                              
+}
+if (-d "STM_SSL") {
+$fol = "STM_SSL";	
+	my $tar = Archive::Tar->new();
+	my @inventory = ();
+	find (sub { push @inventory, $File::Find::name }, $fol);
+	$tar->add_files( @inventory );
+	$tar->write( "$fol.tar" );
+	rmtree("$fol");
+}
+                                                                                             

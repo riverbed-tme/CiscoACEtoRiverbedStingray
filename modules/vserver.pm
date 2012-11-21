@@ -108,21 +108,24 @@ sub setConfig {
 		print VSFILE "port	$vport\n";
 		print VSFILE "protocol	$vprotocol\n" if ($vprotocol ne "http" );
 		if ($cert ne "" and $key ne "") {
-			open(SSLFILE,">>sslfiles_to_rename.txt") or die "Cannot read file sslfiles_to_rename.txt.";
 			open(SSLZCLI,">>sslzcli.txt") or die "Cannot read file sslzcli.txt.";
 			print VSFILE "private_key	$name.private\n";
 			print VSFILE "public_cert	$name.public\n";
 			print VSFILE "ssl_decrypt	Yes\n";
-			print SSLFILE "$key -> $name.private , $cert -> $name.public\n";
 			print SSLZCLI "$name\n";
-			touch("conf/ssl/server_keys/$name.private");
-			touch("conf/ssl/server_keys/$name.pubilc");
-			#print SSLZCLI "zcli <<EOF\nCatalog.SSL.Certificates.importCertificate $name {private_key:<(\"$name.private\"), public_cert:<(\"$name.public\") }\nEOF\n";
-		}
+			mkdir "STM_SSL", 0777 unless -d "STM_SSL";
+			if ( -e "ace_ssl/$key") { 
+				copy("ace_ssl/$key","conf/ssl/server_keys/$name.private");
+				copy("ace_ssl/$key","STM_SSL/$name.private");
+			}
+			if ( -e "ace_ssl/$cert") {
+				copy("ace_ssl/$cert","conf/ssl/server_keys/$name.public");
+				copy("ace_ssl/$cert","STM_SSL/$name.public");
+			}
 		close SSLFILE;
-		close SSLZCLI;
+		close SSLZCLI;	
+		}
 		close VSFILE;
 		close TIPFILE;
-		
 }
 1;

@@ -121,7 +121,7 @@ sub setConfig {
 			if ( -e "ace_ssl/$cert") {
 				copy("ace_ssl/$cert","conf/ssl/server_keys/$name.public");
 				copy("ace_ssl/$cert","STM_SSL/$name.public");
-			} else { print "ACE SSL Cert:$cert not found in direcoty ace_ssl\n";
+			} else { print "ACE SSL Cert:$cert not found in direcoty ace_ssl\n"; }
 		close SSLFILE;
 		close SSLZCLI;	
 		}

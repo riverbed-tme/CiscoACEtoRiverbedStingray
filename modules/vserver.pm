@@ -1,7 +1,7 @@
 #!/usr/bin/perl 
 
 package vserver;
-use File::Touch;
+use File::copy qw(copy);
 sub new
 {
     my $class = shift;

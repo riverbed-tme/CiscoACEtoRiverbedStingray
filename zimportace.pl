@@ -8,12 +8,12 @@
 #
 #
 #
-# Note: This script is not intended for complete migration. Please contact your sales engineer or Riverbed Technical support for getting help on complete migration.
+# Note: This script is not intended for complete migration. Please contact your Riverbed sales engineer for getting help on complete migration.
 #use strict;
 use feature qw(say switch);
-use pool;
-use vserver;
-use monitor;
+use modules::pool;
+use modules::vserver;
+use modules::monitor;
 use Archive::Tar;
 use File::Find;
 use File::Path;

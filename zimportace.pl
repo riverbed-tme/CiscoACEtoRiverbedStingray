@@ -22,13 +22,14 @@ use File::Path;
 
 
 #if ($#ARGV < 1) { print "Usage: perl zimportace.pl <ace_config_file> <Traffic Manager Name> \n"; exit };
+open(LOGFILE,">log.txt") or die "Cannot read file log.txt.";
 print "Enter the Cisco ACE configuration file:";
 $config = <>;
 open("config","<$config") or die "Cannot read file $config.";
 print "Enter the directory name that contains ACE SSl Certificates and Keys:";
 our $ace_ssl_dir= <>;
-open(LOGFILE,">log.txt") or die "Cannot read file log.txt.";
-$stmname = $ARGV[1];
+print "Enter the name of Stingray Traffic Manager where you will migrate the ACE config:";
+$stmname = <>;
 my %classl3l4_to_vip = ();
 my %classvip_to_pol_slb = ();
 my %classvip_ssl = ();
@@ -379,20 +380,20 @@ foreach $mm (keys %pol_mm_class_vip) {
 	}
 }
 ############Create SSL ZCLI files########
-if ( -e 'sslzcli.txt') {
-	$file = 'sslzcli.txt';
-	open(ZCLI,">zcli_for_ssl") or die "Cannot read file zcli_for_ssl";
-	open(SSLZCLI , $file);
-	print ZCLI "zcli <<EOF\n";
-	foreach $line (<SSLZCLI>) {
-		chomp ($line);
-		print ZCLI "Catalog.SSL.Certificates.importCertificate $line {private_key:<(\"$line.private\"), public_cert:<(\"$line.public\") }\n";
-	}
-print ZCLI "EOF\n";
-close ZCLI;
-close SSLZCLI;
-unlink 'sslzcli.txt';
-}
+#if ( -e 'sslzcli.txt') {
+#	$file = 'sslzcli.txt';
+#	open(ZCLI,">zcli_for_ssl") or die "Cannot read file zcli_for_ssl";
+#	open(SSLZCLI , $file);
+#	print ZCLI "zcli <<EOF\n";
+#	foreach $line (<SSLZCLI>) {
+#		chomp ($line);
+#		print ZCLI "Catalog.SSL.Certificates.importCertificate $line {private_key:<(\"$line.private\"), public_cert:<(\"$line.public\") }\n";
+#	}
+#print ZCLI "EOF\n";
+#close ZCLI;
+#close SSLZCLI;
+#unlink 'sslzcli.txt';
+#}
 ############Tar the directory ##########
 if ( -d "conf") {
 	$fol = "conf";	

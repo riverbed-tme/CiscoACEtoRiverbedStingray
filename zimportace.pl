@@ -11,6 +11,8 @@
 # Note: This script is not intended for complete migration. Please contact your sales engineer or Riverbed Technical support for getting help on complete migration.
 #use strict;
 use feature qw(say switch);
+use Findbin;
+use lib "$FindBin::Bin";
 use modules::pool;
 use modules::vserver;
 use modules::monitor;
@@ -18,8 +20,13 @@ use Archive::Tar;
 use File::Find;
 use File::Path;
 
-if ($#ARGV < 1) { print "Usage: perl zimportace.pl <ace_config_file> <Traffic Manager Name> \n"; exit };
-open("config","<$ARGV[0]") or die "Cannot read file $ARGV[0].";
+
+#if ($#ARGV < 1) { print "Usage: perl zimportace.pl <ace_config_file> <Traffic Manager Name> \n"; exit };
+print "Enter the Cisco ACE configuration file:";
+$config = <>;
+open("config","<$config") or die "Cannot read file $config.";
+print "Enter the directory name that contains ACE SSl Certificates and Keys:";
+our $ace_ssl_dir= <>;
 open(LOGFILE,">log.txt") or die "Cannot read file log.txt.";
 $stmname = $ARGV[1];
 my %classl3l4_to_vip = ();

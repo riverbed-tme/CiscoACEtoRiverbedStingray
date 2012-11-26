@@ -87,8 +87,6 @@ sub getTip {
 }
 sub setConfig {
 	my ($self,$vsName) = @_;
-	   open(VSFILE,">conf/vservers/$vsName") or die "Cannot read file conf/vservers/$vsName.";
-	   open(TIPFILE,">conf/flipper/$vsName") or die "Cannot read file conf/flipper/$vsName.";
 	   	my $vport = $self->getVport();
 		my $vprotocol = $self->getVprotocol();
 		my $pool = $self->getPool();
@@ -96,33 +94,43 @@ sub setConfig {
 		my $key = $self->getKey();
 		my $enable = $self->getEnable();
 		my $tip = $self->getTip();
-		my $name = $self->getSSLname();
+		my $sslname = $self->getSSLname();
 		my $vname = $self->getName();
 		my $stmname = $self->getSTMname();
+		my $ace_ssl_dir = "ace_ssl";
+		open(VSFILE,">conf/vservers/$vsName") or die "Cannot read file conf/vservers/$vsName.";
+		open(TIPFILE,">conf/flipper/$tip") or die "Cannot read file conf/flipper/$tip.";
+		open(SSLCONF,">>conf/ssl/servers_keys_config") or die "Cannot read file conf/ssl/servers_keys_config.";
 		print TIPFILE "ipaddresses		$tip\n";
 		print TIPFILE "machines		$stmname\n";
 		print TIPFILE "mode		singlehosted\n";
-		print VSFILE "address	!$vname\n";
+		print VSFILE "address	!$tip\n";
 		if ($enable eq "yes") { print VSFILE "enabled	Yes\n"; }
 		print VSFILE "pool	$pool\n";
 		print VSFILE "port	$vport\n";
 		print VSFILE "protocol	$vprotocol\n" if ($vprotocol ne "http" );
 		if ($cert ne "" and $key ne "") {
-			open(SSLZCLI,">>sslzcli.txt") or die "Cannot read file sslzcli.txt.";
+			#open(SSLZCLI,">>sslzcli.txt") or die "Cannot read file sslzcli.txt.";
 			print VSFILE "private_key	$name.private\n";
 			print VSFILE "public_cert	$name.public\n";
 			print VSFILE "ssl_decrypt	Yes\n";
-			print SSLZCLI "$name\n";
-			mkdir "STM_SSL", 0777 unless -d "STM_SSL";
-			if ( -e "ace_ssl/$key") { 
-				copy("ace_ssl/$key","conf/ssl/server_keys/$name.private");
-				copy("ace_ssl/$key","STM_SSL/$name.private");
-			} else { print "ACE SSL Key:$key not found in direcoty ace_ssl\n";}
-			if ( -e "ace_ssl/$cert") {
-				copy("ace_ssl/$cert","conf/ssl/server_keys/$name.public");
-				copy("ace_ssl/$cert","STM_SSL/$name.public");
-			} else { print "ACE SSL Cert:$cert not found in direcoty ace_ssl\n"; }
-		close SSLZCLI;	
+			#print SSLZCLI "$name\n";
+			#mkdir "STM_SSL", 0777 unless -d "STM_SSL";
+			if ( -e "$ace_ssl_dir/$cert") {
+				copy("$ace_ssl_dir/$cert","conf/ssl/server_keys/$sslname.public");
+				#copy("$ace_ssl_dir/$cert","STM_SSL/$sslname.public");
+				print SSLCONF "$sslname!public\t%zeushome%/zxtm/conf/ssl/server_keys/$sslname.public\n";
+				
+			} else { print "ACE SSL Cert:$cert not found in directory $ace_ssl_dir\n"; }
+			if ( -e "$ace_ssl_dir/$key") { 
+				copy("$ace_ssl_dir/$key","conf/ssl/server_keys/$sslname.private");
+				#copy("$ace_ssl_dir/$key","STM_SSL/$sslname.private");
+				print SSLCONF "$sslname!private\t%zeushome%/zxtm/conf/ssl/server_keys/$sslname.private\n";
+				
+			} else { print "ACE SSL Key:$key not found in directory $ace_ssl_dir\n";}
+			print SSLCONF "$sslname!managed\tyes\n";
+			print SSLCONF "$sslname!note\n";
+		close SSLCONF;	
 		}
 		close VSFILE;
 		close TIPFILE;

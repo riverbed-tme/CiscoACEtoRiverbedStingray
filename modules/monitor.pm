@@ -83,6 +83,7 @@ sub setMonitorConfig {
 			if ($path eq "") { $path = "/" ;}
 			if ($delay ne "3" ) { print MONFILE "delay		$delay\n";}
 			if ($failure ne "3") { print MONFILE "failures		$failure\n";}
+			print MONFILE "editable_keys   host_header path authentication status_regex body_regex\n";
 			if(($header=$self->getHeader()) ne "") { print MONFILE "host_header		$header\n"; }
 			print MONFILE "path		$path\n";
 			print MONFILE "type		$type\n";
@@ -92,6 +93,7 @@ sub setMonitorConfig {
 			if ($path eq "") { $path = "/" ;}
 			if ($delay ne "5" ) { print MONFILE "delay		$delay\n";}
 			if ($failure ne "3") { print MONFILE "failures		$failure\n";}
+			print MONFILE "editable_keys   host_header path authentication status_regex body_regex\n";
 			if(($header=$self->getHeader()) ne "") { print MONFILE "host_header		$header\n"; }
 			print MONFILE "path		$path\n";
 			print MONFILE "type		$type\n";

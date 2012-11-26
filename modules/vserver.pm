@@ -111,8 +111,8 @@ sub setConfig {
 		print VSFILE "protocol	$vprotocol\n" if ($vprotocol ne "http" );
 		if ($cert ne "" and $key ne "") {
 			#open(SSLZCLI,">>sslzcli.txt") or die "Cannot read file sslzcli.txt.";
-			print VSFILE "private_key	$name.private\n";
-			print VSFILE "public_cert	$name.public\n";
+			print VSFILE "private_key	$sslname.private\n";
+			print VSFILE "public_cert	$sslname.public\n";
 			print VSFILE "ssl_decrypt	Yes\n";
 			#print SSLZCLI "$name\n";
 			#mkdir "STM_SSL", 0777 unless -d "STM_SSL";

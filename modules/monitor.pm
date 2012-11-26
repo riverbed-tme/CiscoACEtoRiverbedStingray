@@ -71,6 +71,7 @@ sub getDelay {
 sub setMonitorConfig {
 	my ($self) = @_;
 	$monName = $self->getName();
+	mkdir "conf/monitors",0777 unless -d "conf/monitors";
 	open(MONFILE,">conf/monitors/$monName") or die "Cannot read file conf/pools/$monName.";
 	my $type = $self->getType();
 	my $status = $self->getStatus();

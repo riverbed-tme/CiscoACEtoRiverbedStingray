@@ -88,7 +88,8 @@ sub getPersistCookie {
 }
 sub setPoolConfig {
 	my ($self,$poolName) = @_;
-	   open(POOLFILE,">conf/pools/$poolName") or die "Cannot read file conf/pools/$poolName.";
+		mkdir "conf/pools", 0777 unless -d "conf/pools";
+		open(POOLFILE,">conf/pools/$poolName") or die "Cannot read file conf/pools/$poolName.";
 		my @nodes = $self->getNodes();
 		my @state = $self->getState();
 		my $monitor = $self->getMonitor();
@@ -109,6 +110,7 @@ sub setPoolConfig {
 			$persisttype = $self->getPersistType();
 			$cookie = $self->getPersistCookie();
 			print POOLFILE "persistence		$persist\n";
+			mkdir "conf/persistence",0777 unless -d "conf/persistence";
 			open (PERSISTFILE, ">conf/persistence/$persist") or die "Cannot read file conf/persistence/$persist.";
 			if ($persisttype eq "ip") { print PERSISTFILE "type		$persisttype\n";}
 			else { print PERSISTFILE "cookie	$cookie\ntype	$persisttype\n"; }

@@ -98,9 +98,10 @@ sub setConfig {
 		my $vname = $self->getName();
 		my $stmname = $self->getSTMname();
 		my $ace_ssl_dir = "ace_ssl";
+		mkdir "conf/vservers", 0777 unless -d "conf/vservers";
+		mkdir "conf/flipper",0777 unless -d "conf/flipper";
 		open(VSFILE,">conf/vservers/$vsName") or die "Cannot read file conf/vservers/$vsName.";
 		open(TIPFILE,">conf/flipper/$tip") or die "Cannot read file conf/flipper/$tip.";
-		open(SSLCONF,">>conf/ssl/servers_keys_config") or die "Cannot read file conf/ssl/servers_keys_config.";
 		print TIPFILE "ipaddresses		$tip\n";
 		print TIPFILE "machines		$stmname\n";
 		print TIPFILE "mode		singlehosted\n";
@@ -110,6 +111,9 @@ sub setConfig {
 		print VSFILE "port	$vport\n";
 		print VSFILE "protocol	$vprotocol\n" if ($vprotocol ne "http" );
 		if ($cert ne "" and $key ne "") {
+			mkdir "conf/ssl",0777 unless -d "conf/ssl";
+			mkdir "conf/ssl/server_keys",0777 unless -d "conf/ssl/server_keys";
+			open(SSLCONF,">>conf/ssl/servers_keys_config") or die "Cannot read file conf/ssl/servers_keys_config.";
 			#open(SSLZCLI,">>sslzcli.txt") or die "Cannot read file sslzcli.txt.";
 			print VSFILE "private_key	$sslname.private\n";
 			print VSFILE "public_cert	$sslname.public\n";

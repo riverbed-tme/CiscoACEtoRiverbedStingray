@@ -340,26 +340,19 @@ foreach $mm (keys %pol_mm_class_vip) {
 }
 #####Create all necessary files and directories for Stingray Configuration ########
 mkdir "conf", 0777 unless -d "conf"; 
-mkdir "conf/pools", 0777 unless -d "conf/pools";
-mkdir "conf/vservers", 0777 unless -d "conf/vservers";
-mkdir "conf/monitors",0777 unless -d "conf/monitors";
-mkdir "conf/persistence",0777 unless -d "conf/persistence";
-mkdir "conf/flipper",0777 unless -d "conf/flipper";
-mkdir "conf/ssl",0777 unless -d "conf/ssl";
-mkdir "conf/ssl/server_keys",0777 unless -d "conf/ssl/server_keys";
-
 my $atime = $mtime = time;
 my $version = "conf/VERSION_9.0r2";
 #open(VERSION_9,'>',$version) or die "Cannot read file conf/VERSION_9.0";
 open(TIMESTAMP,">conf/TIMESTAMP") or die "Cannot read file conf/TIMESTAMP.";
 open(PARTIAL,">conf/PARTIAL") or die "Cannot read file conf/PARTIAL.";
-#open(TIMESTAMP,">conf/VERSION_9.0r2") or die "Cannot read file conf/VERSION_9.0r2.";
-system ("touch conf/VERSION_9.0r2");
-#utime $atime, $mtime, VERSION_9;
+open(VERSION,">conf/VERSION_9.0r2") or die "Cannot read file conf/VERSION_9.0r2.";
+#system ("touch conf/VERSION_9.0r2");
+utime $atime, $mtime, VERSION;
 utime $atime, $mtime, TIMESTAMP;
 utime $atime, $mtime, PARTIAL;
 close PARTIAL;
 close TIMESTAMP;
+close VERSION;
 #############Create Stingray Pool and Monitor Configuration files ##########
 foreach $poolName ( sort keys %allPools ) {
    	my $name = $allPools{$poolName}->getName(); #print LOGFILE "*** $name\n";

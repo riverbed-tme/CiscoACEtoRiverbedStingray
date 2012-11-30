@@ -9,7 +9,6 @@
 #
 #
 # Note: This script is not intended for complete migration. Please contact your sales engineer or Riverbed Technical support for getting help on complete migration.
-#use strict;
 use feature qw(say switch);
 use modules::pool;
 use modules::vserver;

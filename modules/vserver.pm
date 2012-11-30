@@ -114,21 +114,16 @@ sub setConfig {
 			mkdir "conf/ssl",0777 unless -d "conf/ssl";
 			mkdir "conf/ssl/server_keys",0777 unless -d "conf/ssl/server_keys";
 			open(SSLCONF,">>conf/ssl/servers_keys_config") or die "Cannot read file conf/ssl/servers_keys_config.";
-			#open(SSLZCLI,">>sslzcli.txt") or die "Cannot read file sslzcli.txt.";
 			print VSFILE "private_key	$sslname.private\n";
 			print VSFILE "public_cert	$sslname.public\n";
 			print VSFILE "ssl_decrypt	Yes\n";
-			#print SSLZCLI "$name\n";
-			#mkdir "STM_SSL", 0777 unless -d "STM_SSL";
 			if ( -e "$ace_ssl_dir/$cert") {
 				copy("$ace_ssl_dir/$cert","conf/ssl/server_keys/$sslname.public");
-				#copy("$ace_ssl_dir/$cert","STM_SSL/$sslname.public");
 				print SSLCONF "$sslname!public\t%zeushome%/zxtm/conf/ssl/server_keys/$sslname.public\n";
 				
 			} else { print "ACE SSL Cert:$cert not found in directory $ace_ssl_dir\n"; }
 			if ( -e "$ace_ssl_dir/$key") { 
 				copy("$ace_ssl_dir/$key","conf/ssl/server_keys/$sslname.private");
-				#copy("$ace_ssl_dir/$key","STM_SSL/$sslname.private");
 				print SSLCONF "$sslname!private\t%zeushome%/zxtm/conf/ssl/server_keys/$sslname.private\n";
 				
 			} else { print "ACE SSL Key:$key not found in directory $ace_ssl_dir\n";}

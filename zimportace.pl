@@ -386,6 +386,7 @@ foreach $mm (keys %pol_mm_class_vip) {
 #unlink 'sslzcli.txt';
 #}
 ############Tar the directory ##########
+$Archive::Tar::DO_NOT_USE_PREFIX = 1;
 if ( -d "conf") {
 	$fol = "conf";	
 	my $tar = Archive::Tar->new();

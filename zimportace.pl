@@ -24,7 +24,7 @@ open(LOGFILE,">log.txt") or die "Cannot read file log.txt.";
 print "Enter the Cisco ACE configuration file:";
 $config = <>;
 open("config","<$config") or die "Cannot read file $config.";
-print "Enter the directory name that contains ACE SSl Certificates and Keys:";
+print "Enter the directory name that contains ACE SSl Certificates and Keys else press ENTER key:";
 our $ace_ssl_dir= <>;
 print "Enter the name of Stingray Traffic Manager where you will migrate the ACE config:";
 $stmname = <>;
@@ -100,8 +100,7 @@ rsLoop: while( $line = <config> ) {
                 given ($words[0]) {
                     when ("ip") { $rserver_ip{$rservername} = $words[2]; }
                     when ("inservice") { $rserver_status{$rservername} = "Active"; }
-                   #when ("probe") { $rserver_probe{$rservername} = $words[1]; }
-                    }
+                   }
 					next;
                 }
 			else { print LOGFILE "$line"; }	
@@ -187,7 +186,6 @@ sfLoop:	while( $line = <config> ) {
 		my $stickyname = $2;
 		print LOGFILE "$line";
 		if ($cookiename eq "JSESSIONID") {  $stickytype = "j2ee"; } else {  $stickytype = "kipper";}
-		#print "sticky-name:$stickyname -cookiename:$cookiename  - Stickytype:$stickytype\n";
 		while ( $line = <config>) {
 			$line =~ s/^\s+//;
 			@words = split(" ",$line);
@@ -224,10 +222,8 @@ sslLoop: while ( $line = <config> ) {
 		my $vsname= $words[2];
 		my $vserver = new vserver( "$vsname");
 		print LOGFILE "$line";
-		#print "$line";
 		while ($line = <config>) {
 			$line =~ s/^\s+//;
-			#print "$line";
 			@words = split (" ",$line);
 			if (  $line eq "\r"  or $line =~ m/^!/i or $line eq "" ) { last; }
 			if ( $words[0] eq "class-map" and $words[1] eq ("match-all" or "match-any") ) { seek("config", -(length($line)+1), 1);  last ;}
@@ -274,8 +270,6 @@ sslLoop: while ( $line = <config> ) {
 		print LOGFILE "$line";
 lbLoop:	while ($line = <config> ) {
 			$line =~ s/^\s+//;
-			#chomp $line;
-			#my $flag = "on";
 			@words = split(" ",$line);
 			if (  $line eq "\r"  or $line =~ m/^!/i or $line eq "" ) {last lbLoop;} 
 			if ( $line =~ m/policy-map type\s(.*?)$/) { seek("config", -(length($line)+1), 1);last lbLoop;}
@@ -317,6 +311,7 @@ mmLoop:	while ($line = <config> ) {
 	}
 	
 }
+######### Create Stingray Virtual Server object for every Cisco ACE VIP ####################
 foreach $mm (keys %pol_mm_class_vip) {
 	my @vips = @ {$pol_mm_class_vip{$mm}};
 	foreach $vip (@vips) {
@@ -342,11 +337,9 @@ foreach $mm (keys %pol_mm_class_vip) {
 mkdir "conf", 0777 unless -d "conf"; 
 my $atime = $mtime = time;
 my $version = "conf/VERSION_9.0r2";
-#open(VERSION_9,'>',$version) or die "Cannot read file conf/VERSION_9.0";
 open(TIMESTAMP,">conf/TIMESTAMP") or die "Cannot read file conf/TIMESTAMP.";
 open(PARTIAL,">conf/PARTIAL") or die "Cannot read file conf/PARTIAL.";
 open(VERSION,">conf/VERSION_9.0r2") or die "Cannot read file conf/VERSION_9.0r2.";
-#system ("touch conf/VERSION_9.0r2");
 utime $atime, $mtime, VERSION;
 utime $atime, $mtime, TIMESTAMP;
 utime $atime, $mtime, PARTIAL;
@@ -357,7 +350,6 @@ close VERSION;
 foreach $poolName ( sort keys %allPools ) {
    	my $name = $allPools{$poolName}->getName(); #print LOGFILE "*** $name\n";
 	my $probe = $allPools{$poolName}->getMonitor();
-	#print LOGFILE "***Pname: $name --- Probe: $probe\n";
 	$allPools{$poolName}->setPoolConfig($name);
 	if ($probe ne "") { $allProbes{$probe}->setMonitorConfig(); }
 }
@@ -366,26 +358,10 @@ foreach $mm (keys %pol_mm_class_vip) {
 	my @vips = @ {$pol_mm_class_vip{$mm}};
 	foreach $vip (@vips) {
 		my $name = $allvirtual{$vip}->getName();
-		#print "name:$name\n";
 		$allvirtual{$vip}->setConfig($name);
 	}
 }
-############Create SSL ZCLI files########
-#if ( -e 'sslzcli.txt') {
-#	$file = 'sslzcli.txt';
-#	open(ZCLI,">zcli_for_ssl") or die "Cannot read file zcli_for_ssl";
-#	open(SSLZCLI , $file);
-#	print ZCLI "zcli <<EOF\n";
-#	foreach $line (<SSLZCLI>) {
-#		chomp ($line);
-#		print ZCLI "Catalog.SSL.Certificates.importCertificate $line {private_key:<(\"$line.private\"), public_cert:<(\"$line.public\") }\n";
-#	}
-#print ZCLI "EOF\n";
-#close ZCLI;
-#close SSLZCLI;
-#unlink 'sslzcli.txt';
-#}
-############Tar the directory ##########
+##############Tar all the configuration files##################
 $Archive::Tar::DO_NOT_USE_PREFIX = 1;
 if ( -d "conf") {
 	$fol = "conf";	

@@ -18,7 +18,6 @@ use Archive::Tar;
 use File::Find;
 use File::Path;
 
-
 #if ($#ARGV < 1) { print "Usage: perl zimportace.pl <ace_config_file> <Traffic Manager Name> \n"; exit };
 open(LOGFILE,">log.txt") or die "Cannot read file log.txt.";
 print "Enter the Cisco ACE configuration file:";

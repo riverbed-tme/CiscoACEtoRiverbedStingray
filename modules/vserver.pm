@@ -113,7 +113,7 @@ sub setConfig {
 		if ($cert ne "" and $key ne "") {
 			mkdir "conf/ssl",0777 unless -d "conf/ssl";
 			mkdir "conf/ssl/server_keys",0777 unless -d "conf/ssl/server_keys";
-			open(SSLCONF,">>conf/ssl/servers_keys_config") or die "Cannot read file conf/ssl/servers_keys_config.";
+			open(SSLCONF,">>conf/ssl/server_keys_config") or die "Cannot read file conf/ssl/servers_keys_config.";
 			print VSFILE "private_key	$sslname.private\n";
 			print VSFILE "public_cert	$sslname.public\n";
 			print VSFILE "ssl_decrypt	Yes\n";
